@@ -1,9 +1,18 @@
 let boxele = document.getElementById('appendHere');
+const popupForm = document.getElementById('popupForm');
+const closePopup = document.getElementById('closePopup');
+//edit
+let submiteditele = document.getElementById("submitedit");
+let editDateele = document.getElementById("editDate");
+let editStatusele = document.getElementById("editStatus");
+let editDescriptionele = document.getElementById('editDescription');
+let editTitleele = document.getElementById("editTitle");
+let editidele = document.getElementById("editid");
 fetchAndRender();
 function fetchAndRender() {
     fetch(`http://localhost:3000/data`)
         .then(r => r.json())
-        .then((data) => { console.log(data); DisplayData(data); Delete(); })
+        .then((data) => { console.log(data); DisplayData(data); Delete(); EditTodo(); })
         .catch(e => console.log(e));
 }
 const DisplayData = (data) => {
@@ -20,7 +29,7 @@ const DisplayData = (data) => {
                 <button data-id=${ele.id}  class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 editele">Edit</button>
                 <button data-id=${ele.id}  class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 deleteele">Delete</button>
               </div>
-            </div>`)).join('')}
+            </div>`)).join("")}
       </div>
     `;
 };
@@ -40,4 +49,56 @@ function Delete() {
                 .catch(e => console.log(e));
         });
     }
+}
+function EditTodo() {
+    let editbtn = document.querySelectorAll(".editele");
+    for (let btn of editbtn) {
+        btn.addEventListener("click", (e) => {
+            popupForm.classList.remove('hidden');
+            let id = e.target.dataset.id;
+            fetch(`http://localhost:3000/data/${id}`)
+                .then(r => r.json())
+                .then((data) => {
+                console.log(data);
+                editidele.value = data.id;
+                editTitleele.value = data.title;
+                editDescriptionele.value = data.desc;
+                editStatusele.value = data.status;
+                editDateele.value = data.date;
+            })
+                .catch(e => console.log(e));
+        });
+    }
+}
+closePopup.addEventListener('click', () => {
+    popupForm.classList.add('hidden');
+});
+afterEditForm();
+function afterEditForm() {
+    submiteditele.addEventListener("click", () => {
+        const object = {
+            id: parseInt(editidele.value),
+            title: editTitleele.value,
+            desc: editDescriptionele.value,
+            status: editStatusele.value,
+            date: new Date(editDateele.value)
+        };
+        fetch(`http://localhost:3000/data/${editidele.value}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(object)
+        })
+            .then(r => r.json())
+            .then((data) => {
+            console.log(data);
+            editidele.value = null;
+            editTitleele.value = "";
+            editDescriptionele.value = "";
+            editStatusele.value = "";
+            editDateele.value = "";
+        })
+            .catch(e => console.log(e));
+    });
 }

@@ -1,10 +1,30 @@
 let boxele = document.getElementById('appendHere') as HTMLDivElement
+const popupForm = document.getElementById('popupForm');
+const closePopup = document.getElementById('closePopup');
+
+//edit
+let submiteditele = document.getElementById("submitedit") as HTMLButtonElement
+let editDateele = document.getElementById("editDate") as HTMLInputElement
+let editStatusele = document.getElementById("editStatus") as HTMLInputElement
+let editDescriptionele = document.getElementById('editDescription') as HTMLInputElement
+let editTitleele = document.getElementById("editTitle") as HTMLInputElement
+let editidele = document.getElementById("editid") as HTMLInputElement
+
+// Instance
+type TodoAdd={
+    id:number,
+    title:string,
+    desc:string,
+    status:string,
+    date:Date
+}
+
 
 fetchAndRender()
 function fetchAndRender() : void{
     fetch(`http://localhost:3000/data`)
     .then(r=>r.json())
-    .then((data)=>{console.log(data); DisplayData(data);Delete()})
+    .then((data)=>{console.log(data); DisplayData(data);Delete();EditTodo()})
     .catch(e=>console.log(e))
 }
 
@@ -25,7 +45,7 @@ const DisplayData = (data: []) : void => {
                 <button data-id=${ele.id}  class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 deleteele">Delete</button>
               </div>
             </div>`
-        )).join('')}
+        )).join("")}
       </div>
     `;
   }
@@ -48,4 +68,70 @@ function Delete() : void{
 
         })
     }
+}
+
+function EditTodo() : void{
+    let editbtn = document.querySelectorAll(".editele")
+    for(let btn of editbtn){
+        btn.addEventListener("click",(e:any) =>{
+            popupForm.classList.remove('hidden');
+            let id :number = e.target.dataset.id
+            fetch(`http://localhost:3000/data/${id}`)
+            .then(r=>r.json())
+            .then((data)=>{
+                console.log(data)
+                editidele.value = data.id
+                editTitleele.value = data.title
+                editDescriptionele.value = data.desc
+                editStatusele.value = data.status
+                editDateele.value = data.date
+                
+            })
+            .catch(e=>console.log(e))
+
+
+        })
+    }
+}
+
+
+
+
+
+
+closePopup.addEventListener('click', () => {
+  popupForm.classList.add('hidden');
+});
+
+
+afterEditForm()
+function afterEditForm():void{
+    
+submiteditele.addEventListener("click",()=>{
+    const object : TodoAdd = {
+        id : parseInt(editidele.value),
+        title:editTitleele.value,
+        desc : editDescriptionele.value,
+        status:editStatusele.value,
+        date : new Date(editDateele.value)
+
+    }
+    fetch(`http://localhost:3000/data/${editidele.value}`,{
+        method : "PATCH",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify(object)
+    })
+    .then(r=>r.json())
+    .then((data)=>{
+        console.log(data);
+        editidele.value = null;
+        editTitleele.value = ""
+        editDescriptionele.value = ""
+        editStatusele.value = ""
+        editDateele.value= ""
+    })
+    .catch(e=>console.log(e))
+})
 }
