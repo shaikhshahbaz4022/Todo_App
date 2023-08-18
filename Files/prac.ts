@@ -40,5 +40,27 @@ function createCar(year: number, type: string, model: string): Car {
     model: model,
   };
 }
-const mercedies = createCar(2023, "Royal-Class", "Latest_Model");
-const toyota = createCar(2024, "fortuner", "Latest_Model");
+const mercedies: Car = createCar(2023, "Royal-Class", "Latest_Model");
+const toyota: Car = createCar(2024, "fortuner", "Latest_Model");
+
+//enums
+
+enum Weekdays {
+  Monday,
+  TuesDay,
+  Wednusday,
+  Thrusday,
+  Friday,
+  Saturday,
+  Sunday,
+}
+function CheckWeekDay(day: Weekdays): string {
+  if (day === Weekdays.Saturday || day === Weekdays.Sunday) {
+    return "Weekend";
+  } else {
+    return "weekdays";
+  }
+}
+const ischeckweekDays: Weekdays = Weekdays.Sunday;
+const daytype: string = CheckWeekDay(ischeckweekDays);
+// console.log(mercedies);
